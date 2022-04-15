@@ -1,39 +1,49 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, ManyToMany, JoinTable} from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import { Category } from "../models/enums";
 import { Artist } from "./Artist";
 import { Comment } from "./Comment";
+import { BaseEntity } from "./core/BaseEntity";
 import { Like } from "./Like";
 import { PlayedSongHistory } from "./PlayedSongHistory";
 import { SongList } from "./SongList";
 
 @Entity()
-export class Song {
+export class Song extends BaseEntity {
+  @Column()
+  title: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  content: string;
 
-    @Column()
-    title: string;
+  @Column("simple-array")
+  categories: Category[];
 
-    @Column()
-    content: string;
+  @ManyToOne(() => Artist, (artist) => artist.songs, {
+    eager: true,
+  })
+  artist: Artist;
 
-    @Column("simple-array")
-    categories: Category[];
+  @OneToMany((type) => Comment, (comment) => comment.song)
+  comments?: Comment[];
 
-    @ManyToOne(() => Artist, artist => artist.songs)
-    artist: Artist;
-    
-    @OneToMany(type => Comment, comment => comment.song)
-    comments: Comment[];
+  @OneToMany((type) => Like, (like) => like.song)
+  likes?: Like[];
 
-    @OneToMany(type => Like, like => like.song)
-    likes: Like[];
+  @OneToMany(
+    (type) => PlayedSongHistory,
+    (playedSongHistory) => playedSongHistory.song
+  )
+  playedSongHistories?: PlayedSongHistory[];
 
-    @OneToMany(type => PlayedSongHistory, playedSongHistory => playedSongHistory.song)
-    playedSongHistories: PlayedSongHistory[];
-
-    @ManyToMany(type => SongList)
-    @JoinTable()
-    songLists: SongList[];
+  @ManyToMany((type) => SongList)
+  @JoinTable()
+  songLists?: SongList[];
 }

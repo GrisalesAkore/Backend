@@ -1,20 +1,17 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Category } from "../models/enums";
+import { BaseEntity } from "./core/BaseEntity";
 import { Song } from "./Song";
 import { User } from "./User";
 
 @Entity()
-export class PlayedSongHistory {
+export class PlayedSongHistory extends BaseEntity {
+  @Column()
+  playedTime: Date;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @ManyToOne((type) => Song, (song) => song.playedSongHistories)
+  song: Song;
 
-    @Column()
-    playedTime: number;
-    
-    @ManyToOne(type => Song, song => song.playedSongHistories)
-    song: Song;
-    
-    @ManyToOne(type => User, user => user.playedSongHistories)
-    user: User;
+  @ManyToOne((type) => User, (user) => user.playedSongHistories)
+  user: User;
 }

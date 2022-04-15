@@ -4,29 +4,29 @@ import { Comment } from "./Comment";
 import { Like } from "./Like";
 import { Song } from "./Song";
 import { User } from "./User";
+import { BaseEntity } from "./core/BaseEntity";
 
 // @TODO: Photo type'lar düzenlenecek
 @Entity()
-export class Artist {
+export class Artist extends BaseEntity {
+  @Column()
+  name: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  bgPhoto: string;
 
-    @Column()
-    bgPhoto: string;
+  @Column()
+  photo: string;
 
-    @Column()
-    photo: string;
+  @Column("simple-array")
+  categories: Category[];
 
-    @Column("simple-array")
-    categories: Category[];
+  @OneToMany((type) => Song, (song) => song.artist)
+  songs?: Song[];
 
-    @OneToMany(type => Song, song => song.artist)
-    songs: Song[];
+  @OneToMany((type) => Like, (like) => like.artist)
+  likes?: Like[];
 
-    @OneToMany(type => Like, like => like.artist)
-    likes: Like[];
-
-    @OneToMany(type => Comment, comment => comment.artist)
-    comments: Comment[];
+  @OneToMany((type) => Comment, (comment) => comment.artist)
+  comments?: Comment[];
 }

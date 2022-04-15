@@ -1,29 +1,32 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { Category } from "../models/enums";
 import { Artist } from "./Artist";
+import { BaseEntity } from "./core/BaseEntity";
 import { Like } from "./Like";
 import { Song } from "./Song";
 import { SongList } from "./SongList";
 import { User } from "./User";
 
 @Entity()
-export class Comment {
+export class Comment extends BaseEntity {
+  @Column()
+  content: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @ManyToOne((type) => SongList, (songList) => songList.comments)
+  songList: SongList;
 
-    @Column()
-    content: string;
+  @ManyToOne((type) => Song, (song) => song.comments)
+  song: Song;
 
-    @ManyToOne(type => SongList, songList => songList.comments)
-    songList: SongList;
+  @ManyToOne((type) => Artist, (artist) => artist.comments)
+  artist: Artist;
 
-    @ManyToOne(type => Song, song => song.comments)
-    song: Song;
-
-    @ManyToOne(type => Artist, artist => artist.comments)
-    artist: Artist;
-
-    @OneToMany(type => Like, like => like.comment)
-    likes: Like[];
+  @OneToMany((type) => Like, (like) => like.comment)
+  likes: Like[];
 }

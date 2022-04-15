@@ -1,32 +1,37 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, ManyToMany, JoinTable} from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import { Category } from "../models/enums";
 import { Comment } from "./Comment";
+import { BaseEntity } from "./core/BaseEntity";
 import { Like } from "./Like";
 import { Song } from "./Song";
 import { User } from "./User";
 
 @Entity()
-export class SongList {
+export class SongList extends BaseEntity {
+  @Column()
+  name: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  bgPhoto: string;
 
-    @Column()
-    name: string;
+  @OneToMany((type) => Comment, (comment) => comment.songList)
+  comments: Comment[];
 
-    @Column()
-    bgPhoto: string;
+  @ManyToOne(() => User, (user) => user.songLists)
+  user: User;
 
-    @OneToMany(type => Comment, comment => comment.songList)
-    comments: Comment[];
-    
-    @ManyToOne(() => User, user => user.songLists)
-    user: User;
+  @OneToMany((type) => Like, (like) => like.songList)
+  likes: Like[];
 
-    @OneToMany(type => Like, like => like.songList)
-    likes: Like[];
-    
-    @ManyToMany(type => Song)
-    @JoinTable()
-    songs: Song[];
+  @ManyToMany((type) => Song)
+  @JoinTable()
+  songs: Song[];
 }
