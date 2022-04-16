@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express"
-import { getCustomRepository, getRepository } from "typeorm"
+import { getCustomRepository } from "typeorm"
 import { Category } from "../entity/core/enums"
 import { PlayedSongHistory } from "../entity/PlayedSongHistory"
 import PlayedSongHistoryRepository from "../repositories/playedSongHistory/PlayedSongHistory.repository"
 import { PlayedSongHistoryDto } from "../repositories/playedSongHistory/PlayedSongHistory.repository.types"
-import DateService from "../tools/DateService"
 import { responseDto } from "../tools/helpers"
 import _ = require("lodash")
 
