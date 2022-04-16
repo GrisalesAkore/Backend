@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { SearchedInfo } from "../models/model";
+import { SearchedInfo } from "./core/models";
 import { BaseEntity } from "./core/BaseEntity";
 import { Feedback } from "./Feedback";
 import { PlayedSongHistory } from "./PlayedSongHistory";

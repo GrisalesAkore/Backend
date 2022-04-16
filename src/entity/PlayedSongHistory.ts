@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Category } from "../models/enums";
+import { Category } from "./core/enums";
 import { BaseEntity } from "./core/BaseEntity";
 import { Song } from "./Song";
 import { User } from "./User";

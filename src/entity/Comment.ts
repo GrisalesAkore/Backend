@@ -5,7 +5,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Category } from "../models/enums";
+import { Category } from "./core/enums";
 import { Artist } from "./Artist";
 import { BaseEntity } from "./core/BaseEntity";
 import { Like } from "./Like";
