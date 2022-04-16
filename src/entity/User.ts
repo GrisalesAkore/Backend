@@ -1,42 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { SearchedInfo } from "./core/models";
-import { BaseEntity } from "./core/BaseEntity";
-import { Feedback } from "./Feedback";
-import { PlayedSongHistory } from "./PlayedSongHistory";
-import { SongList } from "./SongList";
+import { Column, Entity, OneToMany } from "typeorm"
+import { BaseEntity } from "./core/BaseEntity"
+import { SearchedInfo } from "./core/models"
+import { Feedback } from "./Feedback"
+import { PlayedSongHistory } from "./PlayedSongHistory"
+import { SongList } from "./SongList"
 
 @Entity()
 export class User extends BaseEntity {
   @Column()
-  name: string;
+  name: string
 
   @Column()
-  email: string;
+  email: string
 
   @Column()
-  password: string;
+  password: string
 
   @Column()
-  token: string;
+  token: string
 
   @Column({ nullable: true })
-  photo?: string;
+  photo?: string
 
   @Column({ nullable: true })
-  bgPhoto?: string;
+  bgPhoto?: string
 
   @Column({ type: "simple-json", nullable: true, default: [] })
-  searchedInfo?: SearchedInfo[];
+  searchedInfo?: SearchedInfo[]
 
   @OneToMany((type) => Feedback, (feedback) => feedback.user)
-  feedbacks?: Feedback[];
+  feedbacks?: Feedback[]
 
   @OneToMany((type) => SongList, (songList) => songList.user)
-  songLists?: SongList[];
+  songLists?: SongList[]
 
-  @OneToMany(
-    (type) => PlayedSongHistory,
-    (playedSongHistory) => playedSongHistory.user
-  )
-  playedSongHistories?: PlayedSongHistory[];
+  @OneToMany((type) => PlayedSongHistory, (playedSongHistory) => playedSongHistory.user)
+  playedSongHistories?: PlayedSongHistory[]
 }

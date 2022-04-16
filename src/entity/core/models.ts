@@ -1,4 +1,4 @@
 export type SearchedInfo = {
-  searchedKey: string;
-  searchedTime: number;
-};
+  searchedKey: string
+  searchedTime: number
+}

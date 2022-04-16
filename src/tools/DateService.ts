@@ -1,7 +1,7 @@
 class DateService {
   now() {
-    return new Date();
+    return new Date()
   }
 }
 
-export default new DateService();
+export default new DateService()
