@@ -8,3 +8,8 @@ export type PlayedSongHistoryDto = {
     categories: Category[]
   }
 }
+
+export type PlayedSongHistoryDao = {
+  song: number
+  user: number
+}

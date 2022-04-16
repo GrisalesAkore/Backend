@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from "typeorm"
 import { Category } from "../../entity/core/enums"
 import { PlayedSongHistory } from "../../entity/PlayedSongHistory"
-import { PlayedSongHistoryDto } from "./PlayedSongHistory.repository.types"
+import { PlayedSongHistoryDto, PlayedSongHistoryDao } from "./PlayedSongHistory.repository.types"
 
 @EntityRepository(PlayedSongHistory)
 class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
@@ -47,22 +47,10 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
       .take(limit)
       .getMany() as Promise<PlayedSongHistoryDto[]>
   }
+
+  add(playedSongHistory: PlayedSongHistory) {
+    return this.insert(playedSongHistory)
+  }
 }
 
 export default PlayedSongHistoryRepository
-
-// export function getRecommendsByCategory(
-//   mostPlayedCategory: Category,
-//   limit: number = 10
-// ) {
-//   return getRepository(PlayedSongHistory)
-//     .createQueryBuilder("playedHistory")
-//     .select(["playedHistory.id", "playedHistory.playedTime", "song.categories"])
-//     .leftJoinAndSelect("playedHistory.song", "song")
-//     .where("song.categories IN (:categories)", {
-//       categories: mostPlayedCategory,
-//     })
-//     .orderBy("playedHistory.playedTime", "DESC")
-//     .take(limit)
-//     .getMany() as Promise<GetRecommendsByCategoryRepo[]>;
-// }

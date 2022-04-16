@@ -56,13 +56,13 @@ router.get("/recommended/:userId", async (request: Request, response: Response<P
 router.put("/play/:songId/:userId", async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { songId, userId } = request.params
+    const playedSongHistoryRepo = getCustomRepository(PlayedSongHistoryRepository)
 
     const playedSong: PlayedSongHistory = {
       song: songId,
-      user: userId,
-      playedTime: DateService.now()
+      user: userId
     }
-    getRepository(PlayedSongHistory).insert(playedSong)
+    playedSongHistoryRepo.add(playedSong)
 
     response.status(200).send(responseDto({ data: true }))
   } catch (error) {
