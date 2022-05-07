@@ -5,6 +5,7 @@ export type PlayedSongHistoryDto = {
   playedTime: Date
   song: {
     id: number
+    title: string
     categories: Category[]
   }
 }

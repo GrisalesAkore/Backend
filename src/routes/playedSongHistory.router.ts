@@ -5,7 +5,9 @@ import { PlayedSongHistory } from "../entity/PlayedSongHistory"
 import PlayedSongHistoryRepository from "../repositories/playedSongHistory/PlayedSongHistory.repository"
 import { PlayedSongHistoryDto } from "../repositories/playedSongHistory/PlayedSongHistory.repository.types"
 import { responseDto } from "../tools/helpers"
+import SongRepository from "../repositories/song/Song.repository"
 import _ = require("lodash")
+import DateService from "../tools/DateService"
 
 const router = Router()
 
@@ -18,10 +20,10 @@ router.get("/recentlyPlayed/:userId", async (request: Request, response: Respons
 
     const theLastTenSong = await playedSongHistoryRepo.getLastPlayedByUser(userId, limit)
 
-    response.status(200).send(responseDto({ data: { theLastTenSong } }))
+    response.status(200).send(responseDto({ data: theLastTenSong }))
   } catch (error) {
     console.error(error)
-    response.status(400).send(error)
+    response.status(400).send(responseDto({ error }))
   }
 })
 
@@ -45,12 +47,28 @@ router.get("/recommended/:userId", async (request: Request, response: Response<P
       }
     })()
 
-    response.status(200).send(responseDto({ data: { recommendedSongs } }))
+    response.status(200).send(responseDto({ data: recommendedSongs }))
   } catch (error) {
     console.error(error)
-    response.status(400).send(error)
+    response.status(400).send(responseDto({ error }))
   }
 })
+
+// router.get("/popularSongThisWeek", async (request: Request, response: Response<PlayedSongHistoryDto[]>, next: NextFunction) => {
+//   try {
+//     const { limit = 10, date } = request.query
+
+//     const playedSongHistoryRepo = getCustomRepository(PlayedSongHistoryRepository)
+//     const songRepo = getCustomRepository(SongRepository)
+
+//     const popularSongThisWeek = await playedSongHistoryRepo.getPopularByDate(DateService.lastDay(20), limit)
+
+//     response.status(200).send(responseDto({ data: { popularSongThisWeek } }))
+//   } catch (error) {
+//     console.error(error)
+//     response.status(400).send(responseDto({ error }))
+//   }
+// })
 
 router.put("/play/:songId/:userId", async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -66,7 +84,7 @@ router.put("/play/:songId/:userId", async (request: Request, response: Response,
     response.status(200).send(responseDto({ data: true }))
   } catch (error) {
     console.error(error)
-    response.status(400).send(error)
+    response.status(400).send(responseDto({ error }))
   }
 })
 

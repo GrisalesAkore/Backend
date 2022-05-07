@@ -12,6 +12,6 @@ createConnection()
     app.use(bodyParser.json())
     app.use("/", routes)
 
-    app.listen(3000)
+    app.listen(8080)
   })
   .catch((error) => console.log(error))

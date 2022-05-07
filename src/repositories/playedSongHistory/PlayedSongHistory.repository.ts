@@ -1,3 +1,4 @@
+import { groupBy } from "lodash"
 import { EntityRepository, Repository } from "typeorm"
 import { Category } from "../../entity/core/enums"
 import { PlayedSongHistory } from "../../entity/PlayedSongHistory"
@@ -7,7 +8,7 @@ import { PlayedSongHistoryDto, PlayedSongHistoryDao } from "./PlayedSongHistory.
 class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
   getRecommendsByCategory(mostPlayedCategory: Category, limit: number = 10) {
     return this.createQueryBuilder("playedHistory")
-      .select(["playedHistory.id", "playedHistory.playedTime", "song.id", "song.categories"])
+      .select(["playedHistory.id", "playedHistory.playedTime", "song.id", "song.title", "song.categories"])
       .leftJoinAndSelect("playedHistory.song", "song")
       .where("song.categories IN (:categories)", {
         categories: mostPlayedCategory
@@ -22,7 +23,7 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
       .where("playedSongHistory.user = :userId", { userId })
       .orderBy("playedSongHistory.playedTime", "DESC")
       .leftJoinAndSelect("playedSongHistory.song", "song")
-      .select(["playedSongHistory.id", "playedSongHistory.playedTime", "song.id", "song.categories"])
+      .select(["playedSongHistory.id", "playedSongHistory.playedTime", "song.id", "song.title", "song.categories"])
       .take(limit)
       .getMany() as Promise<PlayedSongHistoryDto[]>
   }
@@ -31,7 +32,7 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
     return this.createQueryBuilder("playedSongHistory")
       .orderBy("playedSongHistory.playedTime", "DESC")
       .leftJoinAndSelect("playedSongHistory.song", "song")
-      .select(["playedSongHistory.id", "playedSongHistory.playedTime", "song.id", "song.categories"])
+      .select(["playedSongHistory.id", "playedSongHistory.playedTime", "song.id", "song.title", "song.categories"])
       .take(limit)
       .getMany() as Promise<PlayedSongHistoryDto[]>
   }
@@ -43,10 +44,37 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
         categories: mostPlayedCategory
       })
       .orderBy("playedHistory.playedTime", "DESC")
-      .select(["playedHistory.id", "playedHistory.playedTime", "song.id", "song.categories"])
+      .select(["playedHistory.id", "playedHistory.playedTime", "song.id", "song.title", "song.categories"])
       .take(limit)
       .getMany() as Promise<PlayedSongHistoryDto[]>
   }
+
+  // getPopularByDate(date: Date, limit: number = 10) {
+  //   return this.createQueryBuilder()
+  //     .select("count.song")
+  //     .from((subQuery) => subQuery.from(PlayedSongHistory, "playedHistory").groupBy("playedHistory.song").select("playedHistory.song"), "count")
+  //     .getRawMany()
+
+  //   // return (
+  //   //   this.createQueryBuilder("playedHistory")
+  //   //     .where("playedHistory.playedTime >= :playedTime", { playedTime: date })
+  //   //     .leftJoinAndSelect("playedHistory.song", "song")
+  //   //     // .addGroupBy("song.id")
+  //   //     .groupBy("song.id")
+  //   //     .addGroupBy("playedHistory.id")
+  //   //     // // .select(["song.id", "COUNT(song.id) as playedCount"])
+  //   //     // .select(["id", "song.id"])
+  //   //     .getMany() as any
+  //   // )
+
+  //   // this.createQueryBuilder("playedHistory")
+  //   //   .where("playedHistory.playedTime >= :playedTime", { playedTime: date })
+  //   //   .groupBy("song.id")
+  //   //   .select(["playedHistory.id", "COUNT(song.id) as playedCount"])
+  //   //   // .orderBy("playedHistory.playedCount", "DESC")
+  //   //   .take(limit)
+  //   //   .getMany() as Promise<PlayedSongHistoryDto[]>
+  // }
 
   add(playedSongHistory: PlayedSongHistory) {
     return this.insert(playedSongHistory)
