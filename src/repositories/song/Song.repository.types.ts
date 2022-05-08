@@ -17,3 +17,10 @@ export type SongDao = {
   categories: Category[]
   artist: ArtistDao
 }
+
+export type EditSongDao = {
+  title?: string
+  content?: string
+  categories?: Category[]
+  artist?: number
+}

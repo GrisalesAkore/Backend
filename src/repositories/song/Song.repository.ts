@@ -5,17 +5,20 @@ import { SongDao } from "./Song.repository.types"
 
 @EntityRepository(Song)
 class SongRepository extends Repository<Song> {
-  get(songId?: number, limit: number = 10) {
-    const query = this.createQueryBuilder("song")
+  get(limit: number = 10) {
+    return this.createQueryBuilder("song")
       .leftJoinAndSelect("song.artist", "artist")
-      .select(["song.id", "song.title", "song.content", "song.categories", "artist.id"])
+      .select(["song.id", "song.title", "song.content", "song.categories", "artist.id", "artist.name"])
+      .take(limit)
+      .getMany() as Promise<SongDto[]>
+  }
 
-    if (songId) {
-      query.where("song.id = :songId", { songId })
-      return query.getOneOrFail() as Promise<SongDto>
-    }
-
-    return query.take(limit).getMany() as Promise<SongDto[]>
+  getById(songId: number) {
+    return this.createQueryBuilder("song")
+      .leftJoinAndSelect("song.artist", "artist")
+      .select(["song.id", "song.title", "song.content", "song.categories", "artist.id", "artist.name"])
+      .where("song.id = :songId", { songId })
+      .getOneOrFail() as Promise<SongDto>
   }
 
   add(song: SongDao) {
