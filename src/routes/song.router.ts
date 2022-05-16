@@ -18,6 +18,7 @@ router.get("", async (request: Request, response: Response<SongDto[]>, next: Nex
     response.status(400).send(responseDto({ error }))
   }
 })
+
 router.get("/:songId", async (request: Request, response: Response<SongDto[]>, next: NextFunction) => {
   try {
     const { songId } = request.params
@@ -26,6 +27,20 @@ router.get("/:songId", async (request: Request, response: Response<SongDto[]>, n
     const song = await songRepo.getById(songId)
 
     response.status(200).send(responseDto({ data: song }))
+  } catch (error) {
+    console.error(error)
+    response.status(400).send(responseDto({ error }))
+  }
+})
+
+router.put("/search", async (request: Request, response: Response<SongDto[]>, next: NextFunction) => {
+  try {
+    const { title } = request.body
+    const songRepo = getCustomRepository(SongRepository)
+
+    const songs = await songRepo.searchByTitle(title)
+
+    response.status(200).send(responseDto({ data: songs }))
   } catch (error) {
     console.error(error)
     response.status(400).send(responseDto({ error }))
@@ -58,6 +73,19 @@ Oo ooo oo bile bile kafa tutuyor aşka
 
     await songRepo.save(song)
     response.status(200).send(responseDto({ data: song }))
+  } catch (error) {
+    console.error(error)
+    response.status(400).send(responseDto({ error }))
+  }
+})
+
+router.delete("/:songId", async (request: Request<SongDao>, response: Response, next: NextFunction) => {
+  try {
+    const { songId } = request.params
+    const songRepo = getCustomRepository(SongRepository)
+
+    await songRepo.softDelete(songId)
+    response.status(200).send(responseDto({ data: true }))
   } catch (error) {
     console.error(error)
     response.status(400).send(responseDto({ error }))

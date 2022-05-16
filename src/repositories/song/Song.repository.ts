@@ -1,3 +1,4 @@
+import _ = require("lodash")
 import { EntityRepository, Repository } from "typeorm"
 import { Song } from "../../entity/Song"
 import { SongDto } from "./song.repository.types"
@@ -19,6 +20,14 @@ class SongRepository extends Repository<Song> {
       .select(["song.id", "song.title", "song.content", "song.categories", "artist.id", "artist.name"])
       .where("song.id = :songId", { songId })
       .getOneOrFail() as Promise<SongDto>
+  }
+
+  searchByTitle(likeTitle: string) {
+    return this.createQueryBuilder("song")
+      .leftJoinAndSelect("song.artist", "artist")
+      .select(["song.id", "song.title", "song.content", "song.categories", "artist.id", "artist.name"])
+      .where("LOWER(song.title) LIKE :likeTitle", { likeTitle: `%${_.lowerCase(likeTitle)}%` })
+      .getMany() as Promise<SongDto[]>
   }
 
   add(song: SongDao) {

@@ -2,7 +2,7 @@ import { groupBy } from "lodash"
 import { EntityRepository, Repository } from "typeorm"
 import { Category } from "../../entity/core/enums"
 import { PlayedSongHistory } from "../../entity/PlayedSongHistory"
-import { PlayedSongHistoryDto, PlayedSongHistoryDao } from "./PlayedSongHistory.repository.types"
+import { PlayedSongHistoryDto, PlayedSongHistoryDao, RecentlyPlayedSongDto } from "./PlayedSongHistory.repository.types"
 
 @EntityRepository(PlayedSongHistory)
 class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
@@ -19,13 +19,19 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
   }
 
   getLastPlayedByUser(userId: number, limit: number = 10) {
-    return this.createQueryBuilder("playedSongHistory")
-      .where("playedSongHistory.user = :userId", { userId })
-      .orderBy("playedSongHistory.playedTime", "DESC")
-      .leftJoinAndSelect("playedSongHistory.song", "song")
-      .select(["playedSongHistory.id", "playedSongHistory.playedTime", "song.id", "song.title", "song.categories"])
-      .take(limit)
-      .getMany() as Promise<PlayedSongHistoryDto[]>
+    return this.query(
+      `
+      SELECT DISTINCT song.id as "songId", MAX(ps."playedTime") as "playedTime", song.categories, song.title, artist."name" as "artistName" 
+      FROM played_song_history ps 
+      LEFT JOIN song ON ps."songId" = song.id 
+      LEFT JOIN artist on song."artistId" = artist.id  
+      WHERE ps."userId" = $1
+      GROUP BY song.id, artist.id 
+      ORDER BY MAX(ps."playedTime") DESC, song.id
+      LIMIT $2
+    `,
+      [userId, limit]
+    ) as Promise<any>
   }
 
   getLastPlayed(limit: number = 10) {
@@ -49,32 +55,21 @@ class PlayedSongHistoryRepository extends Repository<PlayedSongHistory> {
       .getMany() as Promise<PlayedSongHistoryDto[]>
   }
 
-  // getPopularByDate(date: Date, limit: number = 10) {
-  //   return this.createQueryBuilder()
-  //     .select("count.song")
-  //     .from((subQuery) => subQuery.from(PlayedSongHistory, "playedHistory").groupBy("playedHistory.song").select("playedHistory.song"), "count")
-  //     .getRawMany()
-
-  //   // return (
-  //   //   this.createQueryBuilder("playedHistory")
-  //   //     .where("playedHistory.playedTime >= :playedTime", { playedTime: date })
-  //   //     .leftJoinAndSelect("playedHistory.song", "song")
-  //   //     // .addGroupBy("song.id")
-  //   //     .groupBy("song.id")
-  //   //     .addGroupBy("playedHistory.id")
-  //   //     // // .select(["song.id", "COUNT(song.id) as playedCount"])
-  //   //     // .select(["id", "song.id"])
-  //   //     .getMany() as any
-  //   // )
-
-  //   // this.createQueryBuilder("playedHistory")
-  //   //   .where("playedHistory.playedTime >= :playedTime", { playedTime: date })
-  //   //   .groupBy("song.id")
-  //   //   .select(["playedHistory.id", "COUNT(song.id) as playedCount"])
-  //   //   // .orderBy("playedHistory.playedCount", "DESC")
-  //   //   .take(limit)
-  //   //   .getMany() as Promise<PlayedSongHistoryDto[]>
-  // }
+  getPopularByDate(date: Date, limit: number = 10) {
+    return this.query(
+      `
+      SELECT DISTINCT song.id as "songId", COUNT(song.id) as "countOfPlayed", song.categories, song.title, artist."name" as "artistName" 
+      FROM played_song_history ps 
+      LEFT JOIN song ON ps."songId" = song.id 
+      LEFT JOIN artist on song."artistId" = artist.id  
+      WHERE ps."playedTime" >= $1
+      GROUP BY song.id, artist.id 
+      ORDER BY COUNT(song.id) DESC, song.id
+      LIMIT $2
+    `,
+      [date, limit]
+    ) as Promise<any>
+  }
 
   add(playedSongHistory: PlayedSongHistory) {
     return this.insert(playedSongHistory)

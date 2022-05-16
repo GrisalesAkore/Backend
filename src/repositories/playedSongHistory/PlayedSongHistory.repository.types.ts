@@ -10,6 +10,14 @@ export type PlayedSongHistoryDto = {
   }
 }
 
+export type RecentlyPlayedSongDto = {
+  songId: number
+  playedTime: Date
+  categories: string
+  title: string
+  artistName: string
+}
+
 export type PlayedSongHistoryDao = {
   song: number
   user: number
